@@ -143,3 +143,4 @@ export type ViewType =
   | "reports" 
   | "monscore"
   | "settings"
+  | "help"

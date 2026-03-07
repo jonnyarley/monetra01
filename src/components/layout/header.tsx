@@ -27,8 +27,8 @@ export function Header() {
   const unreadCount = notifications.filter((n) => !n.isRead).length
 
   const handleHelpClick = () => {
-    // Abre o cliente de email diretamente
-    window.location.href = "mailto:suportmonetra@outlook.com?subject=[Monetra] Preciso de ajuda"
+    // Navega para a página de ajuda
+    setCurrentView("help")
   }
 
   const handleLogout = async () => {

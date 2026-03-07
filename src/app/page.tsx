@@ -14,6 +14,7 @@ import { ReportsView } from "@/components/reports/reports-view"
 import { MonScoreView } from "@/components/monscore/monscore-view"
 import { SettingsView } from "@/components/settings/settings-view"
 import { AdminDashboard } from "@/components/admin/admin-dashboard"
+import { HelpView } from "@/components/help/help-view"
 
 export default function Home() {
   const { isAuthenticated, isAuthLoading, isAdmin, currentView, setAuthLoading } = useAppStore()
@@ -75,6 +76,8 @@ export default function Home() {
         return <MonScoreView />
       case "settings":
         return <SettingsView />
+      case "help":
+        return <HelpView />
       default:
         return <DashboardView />
     }
