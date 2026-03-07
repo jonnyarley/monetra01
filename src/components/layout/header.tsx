@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { useAppStore } from "@/lib/store"
 import { Bell, Search, Moon, Sun, User, LogOut, HelpCircle, Settings, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -18,11 +19,13 @@ import { useTheme } from "next-themes"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { HelpSupportModal } from "@/components/help-support-modal"
 
 export function Header() {
   const { user, notifications, setCurrentView, setSidebarOpen, reset, setAuthenticated } = useAppStore()
   const { theme, setTheme } = useTheme()
   const router = useRouter()
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false)
   
   const unreadCount = notifications.filter((n) => !n.isRead).length
 
@@ -85,7 +88,12 @@ export function Header() {
         </Button>
 
         {/* Help - Hidden on mobile */}
-        <Button variant="ghost" size="icon" className="rounded-full hidden md:flex h-9 w-9">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="rounded-full hidden md:flex h-9 w-9"
+          onClick={() => setIsHelpModalOpen(true)}
+        >
           <HelpCircle className="h-5 w-5" />
         </Button>
 
@@ -180,6 +188,9 @@ export function Header() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      {/* Modal de Ajuda e Suporte */}
+      <HelpSupportModal isOpen={isHelpModalOpen} onClose={() => setIsHelpModalOpen(false)} />
     </header>
   )
 }
