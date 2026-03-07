@@ -1,0 +1,493 @@
+// Monetra - Financial Management SaaS
+// Complete Database Schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== USER & AUTHENTICATION ====================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String?
+  image         String?
+  emailVerified DateTime?
+  twoFactorEnabled  Boolean @default(false)
+  twoFactorSecret   String?
+  
+  // Preferences
+  currency      String    @default("BRL")
+  language      String    @default("pt-BR")
+  timezone      String    @default("America/Sao_Paulo")
+  theme         String    @default("system")
+  notificationsEnabled Boolean @default(true)
+  
+  // Plan & Subscription
+  plan          Plan      @default(FREE)
+  stripeCustomerId    String?
+  stripeSubscriptionId String?
+  subscriptionStatus  SubscriptionStatus?
+  subscriptionEnd     DateTime?
+  
+  // Google Play Billing
+  googlePlayProductId      String?   // e.g., "pro_monthly", "business_yearly"
+  googlePlayPurchaseToken  String?
+  googlePlayOrderId        String?
+  googlePlayPackageName    String?
+  subscriptionAutoRenewing Boolean @default(false)
+  
+  // Score & Gamification
+  financialScore Int     @default(0)
+  totalPoints   Int      @default(0)
+  level         Int      @default(1)
+  
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLoginAt   DateTime?
+  
+  // Relations
+  accounts      Account[]
+  sessions      Session[]
+  financialAccounts FinancialAccount[]
+  transactions  Transaction[]
+  categories    Category[]
+  tags          Tag[]
+  cards         Card[]
+  goals         Goal[]
+  budgets       Budget[]
+  notifications Notification[]
+  auditLogs     AuditLog[]
+  bankConnections BankConnection[]
+  reports       Report[]
+  achievements  UserAchievement[]
+  
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String  // oauth, email, etc.
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ==================== FINANCIAL ACCOUNTS ====================
+
+model FinancialAccount {
+  id          String   @id @default(cuid())
+  userId      String
+  
+  name        String
+  type        AccountType
+  balance     Float    @default(0)
+  initialBalance Float @default(0)
+  currency    String   @default("BRL")
+  color       String?
+  icon        String?
+  isDefault   Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  
+  // Bank integration
+  bankName    String?
+  bankCode    String?
+  agency      String?
+  accountNumber String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  
+  @@map("financial_accounts")
+}
+
+model Card {
+  id          String   @id @default(cuid())
+  userId      String
+  
+  name        String
+  type        CardType
+  brand       String?  // Visa, Mastercard, etc.
+  lastDigits  String?
+  limit       Float    @default(0)
+  usedLimit   Float    @default(0)
+  closingDay  Int      @default(10) // Dia de fechamento
+  dueDay      Int      @default(15) // Dia de vencimento
+  color       String?
+  isActive    Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  
+  @@map("cards")
+}
+
+// ==================== TRANSACTIONS ====================
+
+model Transaction {
+  id              String   @id @default(cuid())
+  userId          String
+  accountId       String?
+  cardId          String?
+  categoryId      String?
+  
+  type            TransactionType
+  amount          Float
+  description     String
+  date            DateTime
+  isRecurring     Boolean  @default(false)
+  recurringPeriod String?  // daily, weekly, monthly, yearly
+  isInstallment   Boolean  @default(false)
+  installmentTotal Int?
+  installmentCurrent Int?
+  parentId        String?  // For installments
+  
+  // Location & extra
+  location        String?
+  notes           String?
+  isPaid          Boolean  @default(true)
+  
+  // AI Analysis
+  aiCategory      String?
+  aiConfidence    Float?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account         FinancialAccount? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  card            Card?    @relation(fields: [cardId], references: [id], onDelete: SetNull)
+  category        Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  tags            TransactionTag[]
+  
+  @@map("transactions")
+}
+
+model TransactionTag {
+  transactionId String
+  tagId         String
+  
+  transaction Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  tag         Tag         @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  
+  @@id([transactionId, tagId])
+  @@map("transaction_tags")
+}
+
+// ==================== CATEGORIES & TAGS ====================
+
+model Category {
+  id          String   @id @default(cuid())
+  userId      String?
+  
+  name        String
+  type        TransactionType
+  icon        String?
+  color       String?
+  isDefault   Boolean  @default(false)
+  budget      Float?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  budgets     Budget[]
+  
+  @@map("categories")
+}
+
+model Tag {
+  id          String   @id @default(cuid())
+  userId      String
+  
+  name        String
+  color       String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions TransactionTag[]
+  
+  @@map("tags")
+}
+
+// ==================== GOALS ====================
+
+model Goal {
+  id              String   @id @default(cuid())
+  userId          String
+  
+  name            String
+  description     String?
+  targetAmount    Float
+  currentAmount   Float    @default(0)
+  targetDate      DateTime?
+  category        String?
+  color           String?
+  icon            String?
+  status          GoalStatus @default(IN_PROGRESS)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("goals")
+}
+
+// ==================== BUDGETS ====================
+
+model Budget {
+  id              String   @id @default(cuid())
+  userId          String
+  
+  name            String
+  categoryId      String?
+  amount          Float
+  spent           Float    @default(0)
+  period          BudgetPeriod @default(MONTHLY)
+  month           Int      // 1-12
+  year           Int
+  
+  alerts          Boolean  @default(true)
+  alertThreshold  Int      @default(80) // Alert at 80%
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category        Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  
+  @@map("budgets")
+}
+
+// ==================== NOTIFICATIONS ====================
+
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+  
+  type        NotificationType
+  title       String
+  message     String
+  data        String?  // JSON
+  isRead      Boolean  @default(false)
+  readAt      DateTime?
+  
+  createdAt   DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("notifications")
+}
+
+// ==================== BANK CONNECTIONS ====================
+
+model BankConnection {
+  id              String   @id @default(cuid())
+  userId          String
+  
+  bankName        String
+  bankCode        String
+  connectionId    String   // External ID from Plaid/Open Banking
+  accessToken     String?  // Encrypted
+  refreshToken    String?  // Encrypted
+  status          ConnectionStatus @default(ACTIVE)
+  lastSync        DateTime?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("bank_connections")
+}
+
+// ==================== REPORTS ====================
+
+model Report {
+  id          String   @id @default(cuid())
+  userId      String
+  
+  type        ReportType
+  title       String
+  period      String
+  data        String   // JSON
+  summary     String?
+  aiInsights  String?
+  
+  createdAt   DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("reports")
+}
+
+// ==================== AUDIT LOGS ====================
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String
+  
+  action      String
+  entity      String
+  entityId    String?
+  oldData     String?  // JSON
+  newData     String?  // JSON
+  ipAddress   String?
+  userAgent   String?
+  
+  createdAt   DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("audit_logs")
+}
+
+// ==================== GAMIFICATION ====================
+
+model Achievement {
+  id          String   @id @default(cuid())
+  
+  name        String
+  description String
+  icon        String
+  points      Int
+  category    String
+  
+  users       UserAchievement[]
+  
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  achievementId String
+  earnedAt      DateTime @default(now())
+  
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+  
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+// ==================== ENUMS ====================
+
+enum Plan {
+  FREE
+  BASIC
+  PRO
+  BUSINESS
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  INCOMPLETE
+  TRIALING
+}
+
+enum AccountType {
+  CHECKING
+  SAVINGS
+  INVESTMENT
+  WALLET
+  OTHER
+}
+
+enum CardType {
+  CREDIT
+  DEBIT
+  PREPAID
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+  TRANSFER
+}
+
+enum GoalStatus {
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum BudgetPeriod {
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum NotificationType {
+  ALERT
+  REMINDER
+  INFO
+  WARNING
+  SUCCESS
+}
+
+enum ConnectionStatus {
+  ACTIVE
+  DISCONNECTED
+  EXPIRED
+  ERROR
+}
+
+enum ReportType {
+  MONTHLY
+  YEARLY
+  CATEGORY
+  GOAL
+  AI_ANALYSIS
+}

@@ -1,0 +1,82 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Dourado Fosco Gradiente -->
+    <linearGradient id="matteGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C9A227"/>
+      <stop offset="25%" stop-color="#D4AF37"/>
+      <stop offset="50%" stop-color="#B8860B"/>
+      <stop offset="75%" stop-color="#DAA520"/>
+      <stop offset="100%" stop-color="#C9A227"/>
+    </linearGradient>
+    
+    <!-- Background Gradiente Elegante -->
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="50%" stop-color="#16213e"/>
+      <stop offset="100%" stop-color="#0f0f23"/>
+    </linearGradient>
+    
+    <!-- Glow Effect -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Shadow -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="240" fill="url(#bgGradient)" filter="url(#shadow)"/>
+  
+  <!-- Outer Ring - Dourado -->
+  <circle cx="256" cy="256" r="230" fill="none" stroke="url(#matteGold)" stroke-width="3" opacity="0.3"/>
+  
+  <!-- Inner Ring - Dourado -->
+  <circle cx="256" cy="256" r="220" fill="none" stroke="url(#matteGold)" stroke-width="1" opacity="0.2"/>
+  
+  <!-- Modern M Symbol -->
+  <g filter="url(#glow)">
+    <!-- M moderno com design geométrico -->
+    <path 
+      d="M140 360 
+         L140 180 
+         L180 180 
+         L256 280 
+         L332 180 
+         L372 180 
+         L372 360 
+         L332 360 
+         L332 250 
+         L256 340 
+         L180 250 
+         L180 360 
+         Z" 
+      fill="url(#matteGold)"
+      stroke="#8B7355"
+      stroke-width="2"
+    />
+    
+    <!-- Accent lines -->
+    <path 
+      d="M155 175 L195 175 L256 255 L317 175 L357 175" 
+      fill="none" 
+      stroke="#DAA520" 
+      stroke-width="1.5" 
+      opacity="0.6"
+    />
+  </g>
+  
+  <!-- Decorative corners -->
+  <g opacity="0.4">
+    <path d="M80 256 L80 160 L176 160" fill="none" stroke="url(#matteGold)" stroke-width="2"/>
+    <path d="M432 256 L432 160 L336 160" fill="none" stroke="url(#matteGold)" stroke-width="2"/>
+    <path d="M80 256 L80 352 L176 352" fill="none" stroke="url(#matteGold)" stroke-width="2"/>
+    <path d="M432 256 L432 352 L336 352" fill="none" stroke="url(#matteGold)" stroke-width="2"/>
+  </g>
+</svg>
