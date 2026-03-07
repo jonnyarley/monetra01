@@ -37,8 +37,8 @@ export function Header() {
       
       toast.success("Logout realizado com sucesso!")
       
-      // Recarregar a página para voltar ao login
-      router.refresh()
+      // Redirecionar para a página inicial
+      window.location.href = "/"
     } catch (error) {
       console.error("Logout error:", error)
       toast.error("Erro ao fazer logout")

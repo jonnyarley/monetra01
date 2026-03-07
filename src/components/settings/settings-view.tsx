@@ -451,7 +451,9 @@ export function SettingsView() {
                       configurar o sistema e muito mais.
                     </p>
                     <Button 
-                      onClick={() => router.push("/admin")}
+                      onClick={() => {
+                        window.location.href = "/admin"
+                      }}
                       className="bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700"
                     >
                       <Settings className="h-4 w-4 mr-2" />
