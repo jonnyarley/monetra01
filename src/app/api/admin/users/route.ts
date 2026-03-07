@@ -96,10 +96,10 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// PATCH - Atualizar status do usuário
+// PATCH - Atualizar status/plano do usuário
 export async function PATCH(request: NextRequest) {
   try {
-    console.log("=== ADMIN USER UPDATE ===")
+    console.log("=== ADMIN USER UPDATE INICIADO ===")
     
     // Verificar se é admin
     const cookieStore = await cookies()
@@ -108,28 +108,38 @@ export async function PATCH(request: NextRequest) {
     if (!adminToken) {
       console.log("ERRO: Sem token admin")
       return NextResponse.json(
-        { error: "Não autorizado" },
+        { error: "Não autorizado - faça login novamente" },
         { status: 401 }
       )
     }
 
-    const jwtSecret = getAdminJwtSecret()
-    const decoded = verify(adminToken, jwtSecret) as { role?: string }
+    let decoded
+    try {
+      const jwtSecret = getAdminJwtSecret()
+      decoded = verify(adminToken, jwtSecret) as { role?: string }
+    } catch (jwtError) {
+      console.log("ERRO: Token inválido", jwtError)
+      return NextResponse.json(
+        { error: "Token expirado - faça login novamente" },
+        { status: 401 }
+      )
+    }
     
     if (decoded.role !== "admin") {
-      console.log("ERRO: Role não é admin")
+      console.log("ERRO: Role não é admin:", decoded)
       return NextResponse.json(
-        { error: "Acesso negado" },
+        { error: "Acesso negado - você não é admin" },
         { status: 403 }
       )
     }
 
     const body = await request.json()
+    console.log("Body recebido:", JSON.stringify(body, null, 2))
+    
     const { userId, action, plan } = body
 
-    console.log("Dados recebidos:", { userId, action, plan })
-
     if (!userId) {
+      console.log("ERRO: userId não fornecido")
       return NextResponse.json(
         { error: "ID do usuário é obrigatório" },
         { status: 400 }
@@ -137,10 +147,19 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Buscar usuário antes de atualizar
-    const userBefore = await db.user.findUnique({
-      where: { id: userId },
-      select: { id: true, name: true, email: true, plan: true, subscriptionStatus: true }
-    })
+    let userBefore
+    try {
+      userBefore = await db.user.findUnique({
+        where: { id: userId },
+        select: { id: true, name: true, email: true, plan: true, subscriptionStatus: true }
+      })
+    } catch (dbError) {
+      console.log("ERRO ao buscar usuário:", dbError)
+      return NextResponse.json(
+        { error: "Erro ao buscar usuário no banco" },
+        { status: 500 }
+      )
+    }
 
     if (!userBefore) {
       console.log("ERRO: Usuário não encontrado:", userId)
@@ -152,45 +171,62 @@ export async function PATCH(request: NextRequest) {
 
     console.log("Usuário encontrado:", userBefore)
 
-    let updateData: {
+    // Preparar dados de atualização
+    const updateData: {
       plan?: string
       subscriptionStatus?: string
-      subscriptionEnd?: Date | null
+      subscriptionEnd?: Date
     } = {}
 
     switch (action) {
       case "activate":
         updateData.subscriptionStatus = "ACTIVE"
+        console.log("Ação: ativar usuário")
         break
+        
       case "suspend":
         updateData.subscriptionStatus = "CANCELED"
-        updateData.subscriptionEnd = null
+        updateData.subscriptionEnd = new Date()
+        console.log("Ação: suspender usuário")
         break
+        
       case "upgrade":
-        // Aceitar BASIC, PRO e BUSINESS
-        if (plan && ["BASIC", "PRO", "BUSINESS"].includes(plan)) {
-          updateData.plan = plan
-          updateData.subscriptionStatus = "ACTIVE"
-          // Definir data de expiração para 1 ano (manual admin)
-          const endDate = new Date()
-          endDate.setFullYear(endDate.getFullYear() + 1)
-          updateData.subscriptionEnd = endDate
-          console.log("Upgrade para:", plan, "Expira em:", endDate)
-        } else {
-          console.log("ERRO: Plano inválido:", plan)
+        if (!plan) {
           return NextResponse.json(
-            { error: "Plano inválido. Use BASIC, PRO ou BUSINESS" },
+            { error: "Plano não especificado para upgrade" },
             { status: 400 }
           )
         }
+        
+        const validPlans = ["BASIC", "PRO", "BUSINESS"]
+        if (!validPlans.includes(plan)) {
+          console.log("ERRO: Plano inválido:", plan)
+          return NextResponse.json(
+            { error: `Plano inválido: ${plan}. Use: ${validPlans.join(", ")}` },
+            { status: 400 }
+          )
+        }
+        
+        updateData.plan = plan
+        updateData.subscriptionStatus = "ACTIVE"
+        // Assinatura válida por 1 ano (manual admin)
+        const endDate = new Date()
+        endDate.setFullYear(endDate.getFullYear() + 1)
+        updateData.subscriptionEnd = endDate
+        
+        console.log(`Ação: upgrade para ${plan}, válido até ${endDate.toISOString()}`)
         break
+        
       case "downgrade":
         updateData.plan = "FREE"
         updateData.subscriptionStatus = "CANCELED"
+        console.log("Ação: downgrade para FREE")
         break
+        
       default:
+        console.log("ERRO: Ação inválida:", action)
         return NextResponse.json(
-          { error: "Ação inválida" },
+          { error: `Ação inválida: ${action}` },
           { status: 400 }
         )
     }
@@ -198,18 +234,26 @@ export async function PATCH(request: NextRequest) {
     console.log("Dados para atualização:", updateData)
 
     // Atualizar usuário
-    const updatedUser = await db.user.update({
-      where: { id: userId },
-      data: updateData
-    })
+    let updatedUser
+    try {
+      updatedUser = await db.user.update({
+        where: { id: userId },
+        data: updateData
+      })
+      console.log("Usuário atualizado com sucesso!")
+    } catch (updateError) {
+      console.log("ERRO ao atualizar:", updateError)
+      return NextResponse.json(
+        { error: "Erro ao atualizar usuário no banco: " + (updateError as Error).message },
+        { status: 500 }
+      )
+    }
 
-    console.log("Usuário atualizado com sucesso:", updatedUser)
-
-    // Tentar criar log de auditoria (pode falhar se tabela não existir)
+    // Tentar criar log de auditoria (não bloqueia se falhar)
     try {
       await db.auditLog.create({
         data: {
-          userId,
+          userId: userId,
           action: `ADMIN_${action.toUpperCase()}`,
           entity: "user",
           entityId: userId,
@@ -217,26 +261,30 @@ export async function PATCH(request: NextRequest) {
           newData: JSON.stringify(updateData),
         }
       })
+      console.log("Log de auditoria criado")
     } catch (auditError) {
-      console.log("Aviso: Não foi possível criar log de auditoria:", auditError)
+      console.log("Aviso: Não foi possível criar log de auditoria (tabela pode não existir)")
     }
 
     return NextResponse.json({
       success: true,
-      message: `Usuário atualizado para ${plan || action}`,
+      message: action === "upgrade" 
+        ? `Plano atualizado para ${plan} com sucesso!` 
+        : `Ação '${action}' executada com sucesso!`,
       user: {
         id: updatedUser.id,
         name: updatedUser.name,
         email: updatedUser.email,
         plan: updatedUser.plan,
-        subscriptionStatus: updatedUser.subscriptionStatus
+        subscriptionStatus: updatedUser.subscriptionStatus,
+        subscriptionEnd: updatedUser.subscriptionEnd
       }
     })
 
   } catch (error) {
-    console.error("Admin user update error:", error)
+    console.error("=== ERRO GERAL ===", error)
     return NextResponse.json(
-      { error: "Erro ao atualizar usuário: " + (error as Error).message },
+      { error: "Erro interno: " + (error as Error).message },
       { status: 500 }
     )
   }
