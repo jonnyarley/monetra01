@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { verify } from "jsonwebtoken"
 import { cookies } from "next/headers"
 import { getAdminJwtSecret } from "@/lib/jwt-secret"
+import { ADMIN_CONFIG } from "@/lib/admin-config"
 
 export async function GET(request: NextRequest) {
   try {
@@ -27,8 +28,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Verificar se o email corresponde ao admin configurado
-    const adminEmail = process.env.ADMIN_EMAIL
-    if (decoded.email.toLowerCase() !== adminEmail?.toLowerCase()) {
+    if (decoded.email.toLowerCase() !== ADMIN_CONFIG.email.toLowerCase()) {
       return NextResponse.json(
         { authenticated: false },
         { status: 403 }

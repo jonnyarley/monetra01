@@ -47,6 +47,8 @@ import {
 } from "@/components/ui/select"
 import { useTheme } from "next-themes"
 import { useAppStore } from "@/lib/store"
+import { AdminLoginModal } from "@/components/admin/admin-login-modal"
+import { toast } from "sonner"
 
 // Lista de emails autorizados a acessar o admin
 const ADMIN_EMAILS = [
@@ -212,15 +214,28 @@ function SubscriptionStatus({ subscription, isLoading }: { subscription: any; is
 
 export function SettingsView() {
   const router = useRouter()
-  const { user, settingsTab, setSettingsTab } = useAppStore()
+  const { user, settingsTab, setSettingsTab, setIsAdmin } = useAppStore()
   const { theme, setTheme } = useTheme()
   
   // Estado da assinatura
   const [subscription, setSubscription] = useState<any>(null)
   const [isSubscriptionLoading, setIsSubscriptionLoading] = useState(true)
   
+  // Estado do modal de login admin
+  const [isAdminModalOpen, setIsAdminModalOpen] = useState(false)
+  
   // Verificar se o usuário é admin
   const isAdmin = user?.email && ADMIN_EMAILS.includes(user.email.toLowerCase())
+  
+  // Handler para sucesso no login admin
+  const handleAdminLoginSuccess = () => {
+    setIsAdmin(true)
+    setIsAdminModalOpen(false)
+    toast.success("Login admin realizado! Redirecionando...")
+    setTimeout(() => {
+      router.push("/admin")
+    }, 500)
+  }
   
   // Carregar dados da assinatura
   useEffect(() => {
@@ -451,9 +466,7 @@ export function SettingsView() {
                       configurar o sistema e muito mais.
                     </p>
                     <Button 
-                      onClick={() => {
-                        window.location.href = "/admin"
-                      }}
+                      onClick={() => setIsAdminModalOpen(true)}
                       className="bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700"
                     >
                       <Settings className="h-4 w-4 mr-2" />
@@ -715,6 +728,13 @@ export function SettingsView() {
           </motion.div>
         </TabsContent>
       </Tabs>
+
+      {/* Modal de Login Admin */}
+      <AdminLoginModal
+        isOpen={isAdminModalOpen}
+        onClose={() => setIsAdminModalOpen(false)}
+        onSuccess={handleAdminLoginSuccess}
+      />
     </div>
   )
 }
