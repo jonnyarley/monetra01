@@ -5,67 +5,18 @@ import { cookies } from "next/headers"
 import { ADMIN_CONFIG } from "@/lib/admin-config"
 import { getAdminJwtSecret } from "@/lib/jwt-secret"
 
-// Rate limiting store (in-memory, para produção use Redis)
-const loginAttempts = new Map<string, { count: number; lastAttempt: number }>()
-
-const RATE_LIMIT_MAX = parseInt(process.env.RATE_LIMIT_MAX_ATTEMPTS || "5")
-const RATE_LIMIT_WINDOW = parseInt(process.env.RATE_LIMIT_WINDOW_MS || "60000")
-
-function isRateLimited(ip: string): boolean {
-  const now = Date.now()
-  const attempts = loginAttempts.get(ip)
-  
-  if (!attempts) {
-    loginAttempts.set(ip, { count: 1, lastAttempt: now })
-    return false
-  }
-  
-  // Reset if window has passed
-  if (now - attempts.lastAttempt > RATE_LIMIT_WINDOW) {
-    loginAttempts.set(ip, { count: 1, lastAttempt: now })
-    return false
-  }
-  
-  // Check if limit exceeded
-  if (attempts.count >= RATE_LIMIT_MAX) {
-    return true
-  }
-  
-  // Increment attempts
-  attempts.count++
-  attempts.lastAttempt = now
-  return false
-}
-
-function clearRateLimit(ip: string) {
-  loginAttempts.delete(ip)
-}
-
-// Delay para prevenir timing attacks
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
-
 export async function POST(request: NextRequest) {
-  const startTime = Date.now()
-  
   try {
-    // Obter IP do cliente
-    const ip = request.headers.get("x-forwarded-for") || 
-               request.headers.get("x-real-ip") || 
-               "unknown"
-    
-    // Verificar rate limiting
-    if (isRateLimited(ip)) {
-      return NextResponse.json(
-        { success: false, error: "Muitas tentativas. Tente novamente em 1 minuto." },
-        { status: 429 }
-      )
-    }
-    
     const body = await request.json()
     const { email, password } = body
 
+    console.log("=== ADMIN LOGIN ATTEMPT ===")
+    console.log("Email recebido:", email)
+    console.log("Email esperado:", ADMIN_CONFIG.email)
+
     // Validar campos obrigatórios
     if (!email || !password) {
+      console.log("ERRO: Email ou senha vazios")
       return NextResponse.json(
         { success: false, error: "Email e senha são obrigatórios" },
         { status: 400 }
@@ -76,26 +27,28 @@ export async function POST(request: NextRequest) {
 
     // Verificar email
     if (emailLower !== ADMIN_CONFIG.email.toLowerCase()) {
-      await delay(500 + Math.random() * 500)
+      console.log("ERRO: Email não corresponde")
       return NextResponse.json(
         { success: false, error: "Credenciais inválidas" },
         { status: 401 }
       )
     }
+
+    console.log("Email correto! Verificando senha...")
 
     // Verificar senha com bcrypt
     const passwordMatch = await compare(password, ADMIN_CONFIG.passwordHash)
+    console.log("Senha confere:", passwordMatch)
     
     if (!passwordMatch) {
-      await delay(500 + Math.random() * 500)
+      console.log("ERRO: Senha incorreta")
       return NextResponse.json(
         { success: false, error: "Credenciais inválidas" },
         { status: 401 }
       )
     }
 
-    // Sucesso - limpar rate limit
-    clearRateLimit(ip)
+    console.log("SUCESSO! Gerando token...")
 
     // Gerar JWT token seguro
     const jwtSecret = getAdminJwtSecret()
@@ -118,10 +71,12 @@ export async function POST(request: NextRequest) {
     cookieStore.set("admin_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: 60 * 60 * 24, // 24 hours
       path: "/"
     })
+
+    console.log("Token gerado e cookie definido!")
 
     return NextResponse.json({
       success: true,
@@ -134,13 +89,6 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error("Admin auth error:", error)
-    
-    // Garantir tempo mínimo de resposta para prevenir timing attacks
-    const elapsed = Date.now() - startTime
-    if (elapsed < 500) {
-      await delay(500 - elapsed)
-    }
-    
     return NextResponse.json(
       { success: false, error: "Erro interno do servidor" },
       { status: 500 }
