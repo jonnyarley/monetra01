@@ -31,7 +31,7 @@ import { toast } from "sonner"
 
 const menuItems: { id: ViewType; label: string; icon: React.ReactNode }[] = [
   { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
-  { id: "assistant", label: "Assistente Teresa IA", icon: <Bot className="h-5 w-5" /> },
+  { id: "assistant", label: "Tera IA", icon: <Bot className="h-5 w-5" /> },
   { id: "transactions", label: "Transações", icon: <ArrowLeftRight className="h-5 w-5" /> },
   { id: "accounts", label: "Contas e Cartões", icon: <Wallet className="h-5 w-5" /> },
   { id: "calendar", label: "Calendário", icon: <Calendar className="h-5 w-5" /> },
