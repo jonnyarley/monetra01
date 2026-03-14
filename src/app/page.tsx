@@ -20,7 +20,7 @@ import { RemindersView } from "@/components/reminders/reminders-view"
 import { ExportsView } from "@/components/exports/exports-view"
 import { OnboardingModal } from "@/components/onboarding/onboarding-modal"
 import { FamilyView } from "@/components/family/family-view"
-import { TeresaAssistantView } from "@/components/assistant/assistant-view"
+import { TeraAssistantView } from "@/components/assistant/assistant-view"
 
 export default function Home() {
   const { isAuthenticated, isAuthLoading, isAdmin, currentView, setAuthLoading, setCurrentView } = useAppStore()
@@ -124,7 +124,7 @@ export default function Home() {
       case "family":
         return <FamilyView />
       case "assistant":
-        return <TeresaAssistantView />
+        return <TeraAssistantView />
       default:
         return <DashboardView />
     }

@@ -16,7 +16,11 @@ import {
   TrendingUp,
   HelpCircle,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  ArrowRightLeft,
+  Search,
+  BarChart3,
+  PieChart
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAppStore } from "@/lib/store"
@@ -31,24 +35,26 @@ interface Message {
 }
 
 const quickActions = [
-  { icon: Bell, label: "Criar lembrete", prompt: "Crie um lembrete para pagar " },
-  { icon: RefreshCw, label: "Gasto recorrente", prompt: "Crie um gasto recorrente de " },
+  { icon: Target, label: "Criar meta", prompt: "Criar meta de " },
+  { icon: Bell, label: "Criar lembrete", prompt: "Criar lembrete para " },
+  { icon: RefreshCw, label: "Gasto recorrente", prompt: "Criar gasto recorrente de " },
   { icon: Plus, label: "Adicionar receita", prompt: "Recebi " },
-  { icon: Target, label: "Criar meta", prompt: "Quero criar uma meta de " },
   { icon: Wallet, label: "Ver saldo", prompt: "Qual é meu saldo atual?" },
-  { icon: TrendingUp, label: "Dicas financeiras", prompt: "Me dê dicas para economizar dinheiro" },
+  { icon: BarChart3, label: "Resumo financeiro", prompt: "Me dê um resumo das minhas finanças" },
+  { icon: Search, label: "Buscar gastos", prompt: "Quais foram meus maiores gastos este mês?" },
+  { icon: PieChart, label: "Análise categorias", prompt: "O que estou gastando mais?" },
 ]
 
 const suggestions = [
-  "Crie um lembrete para a conta de luz dia 15, valor 150 reais",
-  "Adicione uma receita de 500 reais de freelancer",
-  "Crie um gasto recorrente da Netflix de 55 reais dia 10",
-  "Qual é meu saldo atual?",
-  "Me dê dicas para economizar",
-  "Crie uma meta de 1000 reais para emergência",
+  "Quanto gastei com alimentação este mês?",
+  "Crie um lembrete recorrente para aluguel 400 reais dia 15",
+  "Quais contas vencem esta semana?",
+  "Como estão minhas metas?",
+  "Transfira 200 reais para poupança",
+  "Me dê dicas para economizar dinheiro",
 ]
 
-export function TeresaAssistantView() {
+export function TeraAssistantView() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -64,7 +70,36 @@ export function TeresaAssistantView() {
         {
           id: "welcome",
           role: "assistant",
-          content: `Olá${user?.name ? ` ${user.name.split(" ")[0]}` : ""}! 👋 Sou a Teresa, sua assistente financeira do Monetra. Posso ajudá-lo a:\n\n• 🎯 Criar metas financeiras\n• 🔔 Criar lembretes de contas a pagar\n• 🔄 Configurar gastos recorrentes\n• 💰 Adicionar receitas e despesas\n• 📊 Consultar seu saldo\n• 💡 Dar dicas de organização financeira\n\nComo posso ajudar você hoje?`,
+          content: `Olá${user?.name ? ` ${user.name.split(" ")[0]}` : ""}! 👋 Sou a **Tera**, sua assistente financeira inteligente do Monetra.
+
+**Posso ajudá-lo com:**
+
+🎯 **Metas Financeiras**
+• Criar, editar e acompanhar metas
+• "Criar meta de 5000 reais para viagem"
+
+🔔 **Lembretes e Contas**
+• Criar lembretes de contas a pagar
+• Ver contas que vencem esta semana
+
+🔄 **Gastos Recorrentes**
+• Configurar assinaturas e despesas fixas
+• Ver todos os seus gastos mensais
+
+💰 **Receitas e Despesas**
+• Adicionar transações rapidamente
+• Buscar e filtrar gastos
+
+📊 **Análises e Relatórios**
+• Ver resumo financeiro
+• Comparar gastos por período
+• Identificar onde você gasta mais
+
+💡 **Dicas Personalizadas**
+• Sugestões de economia
+• Alertas de gastos excessivos
+
+**Como posso ajudar você hoje?**`,
           timestamp: new Date()
         }
       ])
@@ -109,13 +144,6 @@ export function TeresaAssistantView() {
         timestamp: new Date()
       }
 
-      // Se foi uma ação executada com sucesso, adicionar confirmação
-      if (data.success && data.action !== "general_chat" && data.action !== "query_balance" && data.action !== "query_transactions") {
-        assistantMessage.content += `\n\n✅ ${data.executionResult}`
-      } else if (!data.success) {
-        assistantMessage.content += `\n\n❌ ${data.executionResult}`
-      }
-
       setMessages(prev => [...prev, assistantMessage])
     } catch (error) {
       console.error("Error sending message:", error)
@@ -158,7 +186,7 @@ export function TeresaAssistantView() {
           </div>
           <div className="flex-1">
             <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
-              Teresa IA
+              Tera IA
               <span className="px-2 py-0.5 text-xs bg-amber-500/20 text-amber-600 rounded-full">Assistente</span>
             </h1>
             <p className="text-sm text-muted-foreground">
@@ -213,7 +241,7 @@ export function TeresaAssistantView() {
                     <div className="w-6 h-6 rounded-full bg-gradient-to-br from-amber-500 to-yellow-600 flex items-center justify-center">
                       <Bot className="h-3 w-3 text-white" />
                     </div>
-                    <span className="text-xs font-medium text-muted-foreground">Teresa IA</span>
+                    <span className="text-xs font-medium text-muted-foreground">Tera IA</span>
                     {message.action && message.action !== "general_chat" && (
                       <span className="flex items-center gap-1 text-xs">
                         {message.success ? (
@@ -252,7 +280,7 @@ export function TeresaAssistantView() {
                 </div>
                 <div className="flex items-center gap-1">
                   <Loader2 className="h-4 w-4 animate-spin text-amber-500" />
-                  <span className="text-sm text-muted-foreground">Pensando...</span>
+                  <span className="text-sm text-muted-foreground">Analisando...</span>
                 </div>
               </div>
             </div>
@@ -326,7 +354,7 @@ export function TeresaAssistantView() {
         className="flex items-center gap-2 justify-center mt-3 text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
         <HelpCircle className="h-4 w-4" />
-        <span>O que o assistente pode fazer?</span>
+        <span>O que a Tera pode fazer?</span>
       </button>
     </div>
   )
