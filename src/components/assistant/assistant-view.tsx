@@ -48,7 +48,7 @@ const suggestions = [
   "Crie uma meta de 1000 reais para emergência",
 ]
 
-export function AIAssistantView() {
+export function TeresaAssistantView() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -64,7 +64,7 @@ export function AIAssistantView() {
         {
           id: "welcome",
           role: "assistant",
-          content: `Olá${user?.name ? ` ${user.name.split(" ")[0]}` : ""}! 👋 Sou seu assistente financeiro do Monetra. Posso ajudá-lo a:\n\n• Criar lembretes de contas a pagar\n• Configurar gastos recorrentes\n• Adicionar receitas e despesas\n• Criar metas financeiras\n• Consultar seu saldo\n• Dar dicas de organização financeira\n\nComo posso ajudar você hoje?`,
+          content: `Olá${user?.name ? ` ${user.name.split(" ")[0]}` : ""}! 👋 Sou a Teresa, sua assistente financeira do Monetra. Posso ajudá-lo a:\n\n• 🎯 Criar metas financeiras\n• 🔔 Criar lembretes de contas a pagar\n• 🔄 Configurar gastos recorrentes\n• 💰 Adicionar receitas e despesas\n• 📊 Consultar seu saldo\n• 💡 Dar dicas de organização financeira\n\nComo posso ajudar você hoje?`,
           timestamp: new Date()
         }
       ])
@@ -158,11 +158,11 @@ export function AIAssistantView() {
           </div>
           <div className="flex-1">
             <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
-              Assistente Monetra
-              <span className="px-2 py-0.5 text-xs bg-amber-500/20 text-amber-600 rounded-full">IA</span>
+              Teresa IA
+              <span className="px-2 py-0.5 text-xs bg-amber-500/20 text-amber-600 rounded-full">Assistente</span>
             </h1>
             <p className="text-sm text-muted-foreground">
-              Seu assistente financeiro inteligente
+              Sua assistente financeira inteligente
             </p>
           </div>
           <div className="hidden md:flex items-center gap-2">
@@ -213,7 +213,7 @@ export function AIAssistantView() {
                     <div className="w-6 h-6 rounded-full bg-gradient-to-br from-amber-500 to-yellow-600 flex items-center justify-center">
                       <Bot className="h-3 w-3 text-white" />
                     </div>
-                    <span className="text-xs font-medium text-muted-foreground">Assistente</span>
+                    <span className="text-xs font-medium text-muted-foreground">Teresa IA</span>
                     {message.action && message.action !== "general_chat" && (
                       <span className="flex items-center gap-1 text-xs">
                         {message.success ? (
