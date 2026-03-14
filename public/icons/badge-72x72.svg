@@ -1,0 +1,25 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="matteGoldSmall" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C9A227"/>
+      <stop offset="50%" stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#B8860B"/>
+    </linearGradient>
+    <linearGradient id="bgGradientSmall" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#0f0f23"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="48" height="48" rx="12" fill="url(#bgGradientSmall)"/>
+  
+  <!-- Border -->
+  <rect x="1" y="1" width="46" height="46" rx="11" fill="none" stroke="url(#matteGoldSmall)" stroke-width="1" opacity="0.3"/>
+  
+  <!-- Modern M -->
+  <path 
+    d="M10 36 L10 14 L16 14 L24 26 L32 14 L38 14 L38 36 L32 36 L32 22 L24 32 L16 22 L16 36 Z" 
+    fill="url(#matteGoldSmall)"
+  />
+</svg>

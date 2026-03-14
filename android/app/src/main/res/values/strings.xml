@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Monetra</string>
+    <string name="title_activity_main">Monetra</string>
+    <string name="package_name">com.monetra.app</string>
+    <string name="custom_url_scheme">com.monetra.app</string>
+</resources>

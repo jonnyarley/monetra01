@@ -1,0 +1,81 @@
+ID;Data;Dia_Semana;Mes;Descricao;Categoria;Subcategoria;Tipo;Valor;Metodo_Pagamento;Status;Observacoes;Saldo_Acumulado
+TX001;01/01/2026;Quinta;2026-01;Saldo Inicial;Inicial;Abertura;Receita;5000,00;PIX;Confirmado;Saldo inicial;5000,00
+TX002;02/01/2026;Sexta;2026-01;Padaria;Alimentação;Padaria;Despesa;-28,50;Dinheiro;Confirmado;Café da manhã;4971,50
+TX003;03/01/2026;Sábado;2026-01;Supermercado;Alimentação;Supermercado;Despesa;-385,00;Cartão Crédito;Confirmado;Compra semanal;4586,50
+TX004;04/01/2026;Domingo;2026-01;Farmácia;Saúde;Higiene;Despesa;-65,90;Cartão Débito;Confirmado;Produtos pessoais;4520,60
+TX005;05/01/2026;Segunda;2026-01;Aluguel;Moradia;Aluguel;Despesa;-1500,00;Boleto;Confirmado;Gasto fixo mensal;3020,60
+TX006;05/01/2026;Segunda;2026-01;Salário;Trabalho;Salário;Receita;5000,00;PIX;Confirmado;Entrada mensal;8020,60
+TX007;06/01/2026;Terça;2026-01;Combustível;Transporte;Gasolina;Despesa;-195,00;Cartão Débito;Confirmado;Posto Ipiranga;7825,60
+TX008;07/01/2026;Quarta;2026-01;Uber;Transporte;Aplicativo;Despesa;-42,00;Cartão Crédito;Confirmado;Deslocamento;7783,60
+TX009;08/01/2026;Quinta;2026-01;Restaurante;Alimentação;Almoço;Despesa;-68,00;Cartão Débito;Confirmado;Trabalho;7715,60
+TX010;09/01/2026;Sexta;2026-01;Delivery;Alimentação;Ifood;Despesa;-89,90;Cartão Crédito;Confirmado;Jantar;7625,70
+TX011;10/01/2026;Sábado;2026-01;Energia Elétrica;Moradia;Energia;Despesa;-245,00;PIX;Confirmado;Conta de luz;7380,70
+TX012;10/01/2026;Sábado;2026-01;Internet;Moradia;Internet;Despesa;-120,00;Cartão Crédito;Confirmado;Gasto fixo;7260,70
+TX013;11/01/2026;Domingo;2026-01;Padaria;Alimentação;Padaria;Despesa;-32,00;Dinheiro;Confirmado;Fim de semana;7228,70
+TX014;12/01/2026;Segunda;2026-01;Supermercado;Alimentação;Supermercado;Despesa;-420,00;Cartão Crédito;Confirmado;Compra semanal;6808,70
+TX015;13/01/2026;Terça;2026-01;Farmácia;Saúde;Medicamentos;Despesa;-95,00;Cartão Débito;Confirmado;Receita médica;6713,70
+TX016;14/01/2026;Quarta;2026-01;Combustível;Transporte;Gasolina;Despesa;-200,00;Cartão Débito;Confirmado;Posto Shell;6513,70
+TX017;15/01/2026;Quinta;2026-01;Academia;Saúde;Academia;Despesa;-89,90;Cartão Débito;Confirmado;Mensalidade;6423,80
+TX018;15/01/2026;Quinta;2026-01;Freelance;Trabalho;Extra;Receita;800,00;PIX;Confirmado;Projeto extra;7223,80
+TX019;16/01/2026;Sexta;2026-01;Cinema;Lazer;Entretenimento;Despesa;-110,00;Cartão Crédito;Confirmado;Filme;7113,80
+TX020;17/01/2026;Sábado;2026-01;Restaurante;Alimentação;Jantar;Despesa;-155,00;Cartão Crédito;Confirmado;Sair com amigos;6958,80
+TX021;18/01/2026;Domingo;2026-01;Supermercado;Alimentação;Supermercado;Despesa;-395,00;Cartão Débito;Confirmado;Compra mensal;6563,80
+TX022;19/01/2026;Segunda;2026-01;Uber;Transporte;Aplicativo;Despesa;-38,50;Cartão Crédito;Confirmado;Deslocamento;6525,30
+TX023;20/01/2026;Terça;2026-01;Plano Saúde;Saúde;Convênio;Despesa;-450,00;Boleto;Confirmado;Gasto fixo mensal;6075,30
+TX024;21/01/2026;Quarta;2026-01;Padaria;Alimentação;Padaria;Despesa;-25,00;Dinheiro;Confirmado;Café;6050,30
+TX025;22/01/2026;Quinta;2026-01;Farmácia;Saúde;Higiene;Despesa;-72,00;Cartão Débito;Confirmado;Produtos;5978,30
+TX026;23/01/2026;Sexta;2026-01;Combustível;Transporte;Gasolina;Despesa;-190,00;Cartão Débito;Confirmado;Posto BR;5788,30
+TX027;24/01/2026;Sábado;2026-01;Delivery;Alimentação;Ifood;Despesa;-78,00;Cartão Crédito;Confirmado;Almoço;5710,30
+TX028;25/01/2026;Domingo;2026-01;Streaming;Lazer;Netflix;Despesa;-39,90;Cartão Crédito;Confirmado;Assinatura;5670,40
+TX029;26/01/2026;Segunda;2026-01;Supermercado;Alimentação;Supermercado;Despesa;-410,00;Cartão Crédito;Confirmado;Compra semanal;5260,40
+TX030;27/01/2026;Terça;2026-01;Água;Moradia;Água;Despesa;-82,00;PIX;Confirmado;Conta de água;5178,40
+TX031;28/01/2026;Quarta;2026-01;Uber;Transporte;Aplicativo;Despesa;-45,00;Cartão Crédito;Confirmado;Deslocamento;5133,40
+TX032;29/01/2026;Quinta;2026-01;Restaurante;Alimentação;Almoço;Despesa;-72,00;Cartão Débito;Confirmado;Trabalho;5061,40
+TX033;30/01/2026;Sexta;2026-01;Padaria;Alimentação;Padaria;Despesa;-30,00;Dinheiro;Confirmado;Café;5031,40
+TX034;31/01/2026;Sábado;2026-01;Farmácia;Saúde;Medicamentos;Despesa;-88,00;Cartão Débito;Confirmado;Remédios;4943,40
+TX035;01/02/2026;Domingo;2026-02;Supermercado;Alimentação;Supermercado;Despesa;-375,00;Cartão Débito;Confirmado;Compra mensal;4568,40
+TX036;02/02/2026;Segunda;2026-02;Combustível;Transporte;Gasolina;Despesa;-205,00;Cartão Débito;Confirmado;Posto Ipiranga;4363,40
+TX037;03/02/2026;Terça;2026-02;Delivery;Alimentação;Ifood;Despesa;-92,00;Cartão Crédito;Confirmado;Jantar;4271,40
+TX038;04/02/2026;Quarta;2026-02;Uber;Transporte;Aplicativo;Despesa;-40,00;Cartão Crédito;Confirmado;Deslocamento;4231,40
+TX039;05/02/2026;Quinta;2026-02;Aluguel;Moradia;Aluguel;Despesa;-1500,00;Boleto;Confirmado;Gasto fixo mensal;2731,40
+TX040;05/02/2026;Quinta;2026-02;Salário;Trabalho;Salário;Receita;5000,00;PIX;Confirmado;Entrada mensal;7731,40
+TX041;06/02/2026;Sexta;2026-02;Restaurante;Alimentação;Jantar;Despesa;-145,00;Cartão Crédito;Confirmado;Sextou;7586,40
+TX042;07/02/2026;Sábado;2026-02;Cinema;Lazer;Entretenimento;Despesa;-120,00;Cartão Crédito;Confirmado;Filme + pipoca;7466,40
+TX043;08/02/2026;Domingo;2026-02;Padaria;Alimentação;Padaria;Despesa;-35,00;Dinheiro;Confirmado;Café;7431,40
+TX044;09/02/2026;Segunda;2026-02;Supermercado;Alimentação;Supermercado;Despesa;-430,00;Cartão Crédito;Confirmado;Compra semanal;7001,40
+TX045;10/02/2026;Terça;2026-02;Energia Elétrica;Moradia;Energia;Despesa;-255,00;PIX;Confirmado;Conta de luz;6746,40
+TX046;10/02/2026;Terça;2026-02;Internet;Moradia;Internet;Despesa;-120,00;Cartão Crédito;Confirmado;Gasto fixo;6626,40
+TX047;11/02/2026;Quarta;2026-02;Combustível;Transporte;Gasolina;Despesa;-198,00;Cartão Débito;Confirmado;Posto Shell;6428,40
+TX048;12/02/2026;Quinta;2026-02;Farmácia;Saúde;Higiene;Despesa;-68,50;Cartão Débito;Confirmado;Produtos;6359,90
+TX049;13/02/2026;Sexta;2026-02;Delivery;Alimentação;Ifood;Despesa;-85,00;Cartão Crédito;Confirmado;Almoço;6274,90
+TX050;14/02/2026;Sábado;2026-02;Restaurante;Alimentação;Jantar;Despesa;-220,00;Cartão Crédito;Confirmado;Dia dos Namorados;6054,90
+TX051;15/02/2026;Domingo;2026-02;Academia;Saúde;Academia;Despesa;-89,90;Cartão Débito;Confirmado;Mensalidade;5965,00
+TX052;15/02/2026;Domingo;2026-02;Freelance;Trabalho;Extra;Receita;800,00;PIX;Confirmado;Projeto extra;6765,00
+TX053;16/02/2026;Segunda;2026-02;Uber;Transporte;Aplicativo;Despesa;-43,00;Cartão Crédito;Confirmado;Deslocamento;6722,00
+TX054;17/02/2026;Terça;2026-02;Supermercado;Alimentação;Supermercado;Despesa;-395,00;Cartão Débito;Confirmado;Compra semanal;6327,00
+TX055;18/02/2026;Quarta;2026-02;Padaria;Alimentação;Padaria;Despesa;-28,00;Dinheiro;Confirmado;Café;6299,00
+TX056;19/02/2026;Quinta;2026-02;Farmácia;Saúde;Medicamentos;Despesa;-105,00;Cartão Débito;Confirmado;Receita;6194,00
+TX057;20/02/2026;Sexta;2026-02;Plano Saúde;Saúde;Convênio;Despesa;-450,00;Boleto;Confirmado;Gasto fixo mensal;5744,00
+TX058;21/02/2026;Sábado;2026-02;Combustível;Transporte;Gasolina;Despesa;-210,00;Cartão Débito;Confirmado;Posto BR;5534,00
+TX059;22/02/2026;Domingo;2026-02;Delivery;Alimentação;Ifood;Despesa;-95,00;Cartão Crédito;Confirmado;Almoço domingo;5439,00
+TX060;23/02/2026;Segunda;2026-02;Supermercado;Alimentação;Supermercado;Despesa;-415,00;Cartão Crédito;Confirmado;Compra mensal;5024,00
+TX061;24/02/2026;Terça;2026-02;Água;Moradia;Água;Despesa;-80,00;PIX;Confirmado;Conta de água;4944,00
+TX062;25/02/2026;Quarta;2026-02;Uber;Transporte;Aplicativo;Despesa;-39,00;Cartão Crédito;Confirmado;Deslocamento;4905,00
+TX063;26/02/2026;Quinta;2026-02;Restaurante;Alimentação;Almoço;Despesa;-70,00;Cartão Débito;Confirmado;Trabalho;4835,00
+TX064;27/02/2026;Sexta;2026-02;Streaming;Lazer;Spotify;Despesa;-24,90;Cartão Crédito;Confirmado;Assinatura;4810,10
+TX065;28/02/2026;Sábado;2026-02;Padaria;Alimentação;Padaria;Despesa;-33,00;Dinheiro;Confirmado;Fim de semana;4777,10
+TX066;01/03/2026;Domingo;2026-03;Supermercado;Alimentação;Supermercado;Despesa;-380,00;Cartão Débito;Confirmado;Compra mensal;4397,10
+TX067;02/03/2026;Segunda;2026-03;Combustível;Transporte;Gasolina;Despesa;-192,00;Cartão Débito;Confirmado;Posto Ipiranga;4205,10
+TX068;03/03/2026;Terça;2026-03;Delivery;Alimentação;Ifood;Despesa;-88,00;Cartão Crédito;Confirmado;Jantar;4117,10
+TX069;04/03/2026;Quarta;2026-03;Farmácia;Saúde;Higiene;Despesa;-75,00;Cartão Débito;Confirmado;Produtos;4042,10
+TX070;05/03/2026;Quinta;2026-03;Aluguel;Moradia;Aluguel;Despesa;-1500,00;Boleto;Confirmado;Gasto fixo mensal;2542,10
+TX071;05/03/2026;Quinta;2026-03;Salário;Trabalho;Salário;Receita;5000,00;PIX;Confirmado;Entrada mensal;7542,10
+TX072;06/03/2026;Sexta;2026-03;Restaurante;Alimentação;Almoço;Despesa;-65,00;Cartão Débito;Confirmado;Trabalho;7477,10
+TX073;07/03/2026;Sábado;2026-03;Supermercado;Alimentação;Supermercado;Despesa;-405,00;Cartão Crédito;Confirmado;Compra semanal;7072,10
+TX074;08/03/2026;Domingo;2026-03;Padaria;Alimentação;Padaria;Despesa;-31,00;Dinheiro;Confirmado;Café;7041,10
+TX075;09/03/2026;Segunda;2026-03;Energia Elétrica;Moradia;Energia;Despesa;-248,00;PIX;Confirmado;Conta de luz;6793,10
+TX076;09/03/2026;Segunda;2026-03;Internet;Moradia;Internet;Despesa;-120,00;Cartão Crédito;Confirmado;Gasto fixo;6673,10
+TX077;10/03/2026;Terça;2026-03;Combustível;Transporte;Gasolina;Despesa;-203,00;Cartão Débito;Confirmado;Posto Shell;6470,10
+TX078;11/03/2026;Quarta;2026-03;Uber;Transporte;Aplicativo;Despesa;-44,00;Cartão Crédito;Confirmado;Deslocamento;6426,10
+TX079;12/03/2026;Quinta;2026-03;Academia;Saúde;Academia;Despesa;-89,90;Cartão Débito;Confirmado;Mensalidade;6336,20
+TX080;12/03/2026;Quinta;2026-03;Freelance;Trabalho;Extra;Receita;800,00;PIX;Confirmado;Projeto extra;7136,20
