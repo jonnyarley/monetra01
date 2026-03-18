@@ -1,0 +1,759 @@
+// Monetra - Financial Management SaaS
+// PostgreSQL Database Schema for Production (Vercel)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== USER & AUTHENTICATION ====================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String?
+  image         String?
+  emailVerified DateTime?
+  twoFactorEnabled  Boolean @default(false)
+  twoFactorSecret   String?
+
+  // Preferences
+  currency      String    @default("BRL")
+  language      String    @default("pt-BR")
+  timezone      String    @default("America/Sao_Paulo")
+  theme         String    @default("system")
+  notificationsEnabled Boolean @default(true)
+
+  // Plan & Subscription
+  plan          Plan      @default(FREE)
+  stripeCustomerId    String?
+  stripeSubscriptionId String?
+  subscriptionStatus  SubscriptionStatus?
+  subscriptionEnd     DateTime?
+  
+  // Trial
+  trialEndsAt        DateTime?  // Data de fim do trial (14 dias após registro)
+  trialUsed          Boolean    @default(false)  // Se já usou o trial
+
+  // Google Play Billing
+  googlePlayProductId      String?
+  googlePlayPurchaseToken  String?
+  googlePlayOrderId        String?
+  googlePlayPackageName    String?
+  subscriptionAutoRenewing Boolean @default(false)
+
+  // Score & Gamification
+  financialScore Int     @default(0)
+  totalPoints   Int      @default(0)
+  level         Int      @default(1)
+
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLoginAt   DateTime?
+
+  // Relations
+  accounts      Account[]
+  sessions      Session[]
+  financialAccounts FinancialAccount[]
+  transactions  Transaction[]
+  categories    Category[]
+  tags          Tag[]
+  cards         Card[]
+  goals         Goal[]
+  budgets       Budget[]
+  notifications Notification[]
+  auditLogs     AuditLog[]
+  bankConnections BankConnection[]
+  reports       Report[]
+  achievements  UserAchievement[]
+  recurringTransactions RecurringTransaction[]
+  billReminders BillReminder[]
+  exportHistory ExportHistory[]
+  onboardingProgress OnboardingProgress?
+  ownedFamilies  Family[]
+  familyMemberships FamilyMember[]
+
+  @@index([email])
+  @@index([plan])
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?  @db.Text
+  access_token      String?  @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?  @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ==================== FINANCIAL ACCOUNTS ====================
+
+model FinancialAccount {
+  id          String   @id @default(cuid())
+  userId      String
+
+  name        String
+  type        AccountType
+  balance     Decimal   @default(0)
+  initialBalance Decimal @default(0)
+  currency    String   @default("BRL")
+  color       String?
+  icon        String?
+  isDefault   Boolean  @default(false)
+  isActive    Boolean  @default(true)
+
+  bankName    String?
+  bankCode    String?
+  agency      String?
+  accountNumber String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@index([userId])
+  @@index([userId, isActive])
+  @@map("financial_accounts")
+}
+
+model Card {
+  id          String   @id @default(cuid())
+  userId      String
+
+  name        String
+  type        CardType
+  brand       String?
+  lastDigits  String?
+  limit       Decimal   @default(0)
+  usedLimit   Decimal   @default(0)
+  closingDay  Int      @default(10)
+  dueDay      Int      @default(15)
+  color       String?
+  isActive    Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@index([userId])
+  @@index([userId, isActive])
+  @@map("cards")
+}
+
+// ==================== TRANSACTIONS ====================
+
+model Transaction {
+  id              String   @id @default(cuid())
+  userId          String
+  accountId       String?
+  cardId          String?
+  categoryId      String?
+
+  type            TransactionType
+  amount          Decimal
+  description     String
+  date            DateTime
+  isRecurring     Boolean  @default(false)
+  recurringPeriod String?
+  isInstallment   Boolean  @default(false)
+  installmentTotal Int?
+  installmentCurrent Int?
+  parentId        String?
+
+  location        String?
+  notes           String?  @db.Text
+  isPaid          Boolean  @default(true)
+
+  aiCategory      String?
+  aiConfidence    Decimal?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account         FinancialAccount? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  card            Card?    @relation(fields: [cardId], references: [id], onDelete: SetNull)
+  category        Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  tags            TransactionTag[]
+
+  @@index([userId])
+  @@index([userId, date])
+  @@index([userId, type])
+  @@index([accountId])
+  @@index([cardId])
+  @@index([categoryId])
+  @@map("transactions")
+}
+
+model TransactionTag {
+  transactionId String
+  tagId         String
+
+  transaction Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  tag         Tag         @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([transactionId, tagId])
+  @@index([tagId])
+  @@map("transaction_tags")
+}
+
+// ==================== CATEGORIES & TAGS ====================
+
+model Category {
+  id          String   @id @default(cuid())
+  userId      String?
+
+  name        String
+  type        TransactionType
+  icon        String?
+  color       String?
+  isDefault   Boolean  @default(false)
+  budget      Decimal?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  budgets     Budget[]
+  recurringTransactions RecurringTransaction[]
+
+  @@index([userId])
+  @@index([isDefault])
+  @@map("categories")
+}
+
+model Tag {
+  id          String   @id @default(cuid())
+  userId      String
+
+  name        String
+  color       String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions TransactionTag[]
+
+  @@index([userId])
+  @@map("tags")
+}
+
+// ==================== GOALS ====================
+
+model Goal {
+  id              String   @id @default(cuid())
+  userId          String
+
+  name            String
+  description     String?  @db.Text
+  targetAmount    Decimal
+  currentAmount   Decimal   @default(0)
+  targetDate      DateTime?
+  category        String?
+  color           String?
+  icon            String?
+  status          GoalStatus @default(IN_PROGRESS)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, status])
+  @@map("goals")
+}
+
+// ==================== BUDGETS ====================
+
+model Budget {
+  id              String   @id @default(cuid())
+  userId          String
+
+  name            String
+  categoryId      String?
+  amount          Decimal
+  spent           Decimal   @default(0)
+  period          BudgetPeriod @default(MONTHLY)
+  month           Int
+  year            Int
+
+  alerts          Boolean  @default(true)
+  alertThreshold  Int      @default(80)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category        Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([userId, month, year])
+  @@index([categoryId])
+  @@map("budgets")
+}
+
+// ==================== NOTIFICATIONS ====================
+
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+
+  type        NotificationType
+  title       String
+  message     String   @db.Text
+  data        String?  @db.Text
+  isRead      Boolean  @default(false)
+  readAt      DateTime?
+
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+// ==================== BANK CONNECTIONS ====================
+
+model BankConnection {
+  id              String   @id @default(cuid())
+  userId          String
+
+  bankName        String
+  bankCode        String
+  connectionId    String
+  accessToken     String?  @db.Text
+  refreshToken    String?  @db.Text
+  status          ConnectionStatus @default(ACTIVE)
+  lastSync        DateTime?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, status])
+  @@map("bank_connections")
+}
+
+// ==================== REPORTS ====================
+
+model Report {
+  id          String   @id @default(cuid())
+  userId      String
+
+  type        ReportType
+  title       String
+  period      String
+  data        String   @db.Text
+  summary     String?  @db.Text
+  aiInsights  String?  @db.Text
+
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, type])
+  @@map("reports")
+}
+
+// ==================== AUDIT LOGS ====================
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String
+
+  action      String
+  entity      String
+  entityId    String?
+  oldData     String?  @db.Text
+  newData     String?  @db.Text
+  ipAddress   String?
+  userAgent   String?
+
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, action])
+  @@index([entity, entityId])
+  @@map("audit_logs")
+}
+
+// ==================== RECURRING TRANSACTIONS ====================
+
+model RecurringTransaction {
+  id              String   @id @default(cuid())
+  userId          String
+
+  type            TransactionType
+  amount          Decimal
+  description     String
+  categoryId      String?
+
+  frequency       RecurringFrequency
+  dayOfMonth      Int      // Dia do mês para lançamento (1-31)
+  startDate       DateTime
+  endDate         DateTime?
+  lastProcessedAt DateTime?
+  nextDueDate     DateTime
+
+  isActive        Boolean  @default(true)
+  autoCreate      Boolean  @default(true) // Criar transação automaticamente
+  notifyBefore    Int      @default(3)    // Dias antes para notificar
+
+  accountId       String?
+  cardId          String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category        Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([userId, isActive])
+  @@index([nextDueDate])
+  @@map("recurring_transactions")
+}
+
+// ==================== BILL REMINDERS ====================
+
+model BillReminder {
+  id              String   @id @default(cuid())
+  userId          String
+
+  name            String
+  amount          Decimal
+  dueDate         DateTime
+  category        String?
+
+  remindDays      Int      @default(3)    // Dias antes para notificar
+  isRecurring     Boolean  @default(false)
+  recurringPeriod String?                // monthly, yearly
+  isPaid          Boolean  @default(false)
+  paidAt          DateTime?
+
+  notes           String?  @db.Text
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, dueDate])
+  @@index([userId, isPaid])
+  @@map("bill_reminders")
+}
+
+// ==================== EXPORT HISTORY ====================
+
+model ExportHistory {
+  id              String   @id @default(cuid())
+  userId          String
+
+  type            ExportType
+  format          ExportFormat
+  status          ExportStatus  @default(PENDING)
+
+  dateRange       String        // Ex: "2024-01", "2024-Q1", "2024"
+  recordCount     Int           @default(0)
+  fileSize        Int?          // em bytes
+  fileUrl         String?
+
+  errorMessage    String?  @db.Text
+
+  createdAt       DateTime @default(now())
+  completedAt     DateTime?
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, createdAt])
+  @@map("export_history")
+}
+
+// ==================== ONBOARDING PROGRESS ====================
+
+model OnboardingProgress {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+
+  currentStep     Int      @default(0)
+  totalSteps      Int      @default(7)
+
+  completedSteps  String   @default("[]") // JSON array of completed step IDs
+
+  skipped         Boolean  @default(false)
+  completedAt     DateTime?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("onboarding_progress")
+}
+
+// ==================== GAMIFICATION ====================
+
+model Achievement {
+  id          String   @id @default(cuid())
+
+  name        String
+  description String   @db.Text
+  icon        String
+  points      Int
+  category    String
+
+  users       UserAchievement[]
+
+  @@index([category])
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  achievementId String
+  earnedAt      DateTime @default(now())
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+
+  @@unique([userId, achievementId])
+  @@index([userId])
+  @@index([achievementId])
+  @@map("user_achievements")
+}
+
+// ==================== FAMILY / SHARED ACCOUNTS ====================
+
+model Family {
+  id          String   @id @default(cuid())
+  name        String
+  description String?  @db.Text
+  ownerId     String
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  members     FamilyMember[]
+  sharedGoals FamilyGoal[]
+  
+  @@index([ownerId])
+  @@map("families")
+}
+
+model FamilyMember {
+  id          String        @id @default(cuid())
+  familyId    String
+  userId      String
+  role        FamilyRole    @default(MEMBER)
+  joinedAt    DateTime      @default(now())
+  
+  family      Family        @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([familyId, userId])
+  @@index([familyId])
+  @@index([userId])
+  @@map("family_members")
+}
+
+model FamilyGoal {
+  id          String   @id @default(cuid())
+  familyId    String
+  name        String
+  description String?  @db.Text
+  targetAmount Decimal
+  currentAmount Decimal @default(0)
+  targetDate  DateTime?
+  status      GoalStatus @default(IN_PROGRESS)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  family      Family   @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  contributions FamilyGoalContribution[]
+  
+  @@index([familyId])
+  @@index([status])
+  @@map("family_goals")
+}
+
+model FamilyGoalContribution {
+  id            String   @id @default(cuid())
+  familyGoalId  String
+  userId        String
+  amount        Decimal
+  contributedAt DateTime @default(now())
+  
+  familyGoal    FamilyGoal @relation(fields: [familyGoalId], references: [id], onDelete: Cascade)
+  
+  @@index([familyGoalId])
+  @@index([userId])
+  @@map("family_goal_contributions")
+}
+
+// ==================== ENUMS ====================
+
+enum Plan {
+  FREE
+  BASIC
+  PRO
+  BUSINESS
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  INCOMPLETE
+  TRIALING
+}
+
+enum AccountType {
+  CHECKING
+  SAVINGS
+  INVESTMENT
+  WALLET
+  OTHER
+}
+
+enum CardType {
+  CREDIT
+  DEBIT
+  PREPAID
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+  TRANSFER
+}
+
+enum GoalStatus {
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum BudgetPeriod {
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum NotificationType {
+  ALERT
+  REMINDER
+  INFO
+  WARNING
+  SUCCESS
+}
+
+enum ConnectionStatus {
+  ACTIVE
+  DISCONNECTED
+  EXPIRED
+  ERROR
+}
+
+enum ReportType {
+  MONTHLY
+  YEARLY
+  CATEGORY
+  GOAL
+  AI_ANALYSIS
+}
+
+// ==================== NOvos ENUMs ====================
+
+enum RecurringFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum ExportType {
+  TRANSACTIONS
+  REPORTS
+  GOALS
+  BUDGETS
+  ALL
+}
+
+enum ExportFormat {
+  PDF
+  CSV
+  XLSX
+}
+
+enum ExportStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum FamilyRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}

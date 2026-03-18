@@ -1,0 +1,61 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportHeight="108"
+    android:viewportWidth="108">
+
+    <!-- Background -->
+    <path
+        android:pathData="M0,0h108v108h-108z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:endX="108"
+                android:endY="108"
+                android:startX="0"
+                android:startY="0"
+                android:type="linear">
+                <item android:color="#1a1a2e" android:offset="0.0" />
+                <item android:color="#16213e" android:offset="0.5" />
+                <item android:color="#0f0f23" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Letter M -->
+    <path
+        android:pathData="M30,75L30,33L40,33L54,55L68,33L78,33L78,75L68,75L68,48L54,70L40,48L40,75Z"
+        android:fillType="evenOdd">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:endX="78"
+                android:endY="75"
+                android:startX="30"
+                android:startY="33"
+                android:type="linear">
+                <item android:color="#C9A227" android:offset="0.0" />
+                <item android:color="#D4AF37" android:offset="0.3" />
+                <item android:color="#B8860B" android:offset="0.7" />
+                <item android:color="#DAA520" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Decorative corners -->
+    <path
+        android:fillColor="#D4AF37"
+        android:fillAlpha="0.3"
+        android:pathData="M10,10L10,20L20,10Z" />
+    <path
+        android:fillColor="#D4AF37"
+        android:fillAlpha="0.3"
+        android:pathData="M98,10L98,20L88,10Z" />
+    <path
+        android:fillColor="#D4AF37"
+        android:fillAlpha="0.3"
+        android:pathData="M10,98L10,88L20,98Z" />
+    <path
+        android:fillColor="#D4AF37"
+        android:fillAlpha="0.3"
+        android:pathData="M98,98L98,88L88,98Z" />
+</vector>
