@@ -9,7 +9,7 @@ import {
   ChevronRight,
   Crown,
   Eye,
-  Family,
+  Users,
   LineChart,
   Plus,
   Sparkles,
@@ -79,7 +79,7 @@ const features = [
     description: "Organize todas as suas contas bancárias e cartões em um só lugar."
   },
   {
-    icon: Family,
+    icon: Users,
     title: "Modo Família",
     description: "Gerencie finanças em família. Metas compartilhadas e controle total.",
     badge: "Business"
