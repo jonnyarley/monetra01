@@ -1,8 +1,8 @@
 "use client"
-// Monetra - Main Page
+// Monex - Main Page
 import { useEffect, useState } from "react"
 import { useAppStore } from "@/lib/store"
-import { AuthForm } from "@/components/auth/auth-form"
+import { LandingPage } from "@/components/landing/landing-page"
 import { MainLayout } from "@/components/layout/main-layout"
 import { DashboardView } from "@/components/dashboard/dashboard-view"
 import { TransactionsView } from "@/components/transactions/transactions-view"
@@ -88,17 +88,17 @@ export default function Home() {
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-yellow-600 flex items-center justify-center animate-pulse shadow-lg shadow-amber-500/20">
-            <img src="/logo-small.svg" alt="Monetra" className="w-12 h-12" />
+            <img src="/logo-small.svg" alt="Monex" className="w-12 h-12" />
           </div>
-          <p className="text-muted-foreground">Carregando Monetra...</p>
+          <p className="text-muted-foreground">Carregando Monex...</p>
         </div>
       </div>
     )
   }
 
-  // Show auth form if not authenticated
+  // Show landing page if not authenticated
   if (!isAuthenticated) {
-    return <AuthForm />
+    return <LandingPage />
   }
 
   // Show Admin Dashboard for admin users
