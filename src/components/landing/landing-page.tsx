@@ -7,13 +7,11 @@ import {
   Bot,
   Check,
   ChevronRight,
-  Crown,
-  Eye,
+  Star,
   Users,
   LineChart,
   Plus,
   Sparkles,
-  Star,
   Target,
   TrendingUp,
   Wallet,
@@ -146,30 +144,7 @@ const plans = [
   }
 ]
 
-// Testimonials
-const testimonials = [
-  {
-    name: "Maria Silva",
-    role: "Empreendedora",
-    content: "Finalmente consegui organizar minhas finanças! A Tera IA me ajudou a entender onde eu estava gastando demais.",
-    avatar: "M",
-    rating: 5
-  },
-  {
-    name: "João Santos",
-    role: "Desenvolvedor",
-    content: "O Mone Score mudou minha forma de ver dinheiro. Agora sei exatamente onde posso melhorar.",
-    avatar: "J",
-    rating: 5
-  },
-  {
-    name: "Ana Oliveira",
-    role: "Designer",
-    content: "O modo família é incrível! Minha esposa e eu finalmente estamos na mesma página sobre nossas finanças.",
-    avatar: "A",
-    rating: 5
-  }
-]
+// Testimonials removed - not needed
 
 // Stats
 const stats = [
@@ -232,7 +207,7 @@ export function LandingPage() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-yellow-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 border border-amber-500/30 flex items-center justify-center overflow-hidden">
                 <img src="/logo-small.svg" alt="Monex" className="w-7 h-7" />
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-amber-500 to-yellow-600 bg-clip-text text-transparent">
@@ -248,9 +223,7 @@ export function LandingPage() {
               <a href="#pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Preços
               </a>
-              <a href="#testimonials" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                Depoimentos
-              </a>
+
               <a href="#faq" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 FAQ
               </a>
@@ -319,10 +292,6 @@ export function LandingPage() {
                 >
                   Começar Agora - Grátis
                   <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-                <Button size="lg" variant="outline" className="text-lg px-8">
-                  <Eye className="mr-2 h-5 w-5" />
-                  Ver Demo
                 </Button>
               </div>
 
@@ -615,58 +584,7 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section id="testimonials" className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <Badge className="mb-4">Depoimentos</Badge>
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-              O que nossos usuários dizem
-            </h2>
-          </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-              >
-                <Card className="h-full">
-                  <CardHeader>
-                    <div className="flex items-center gap-1 mb-2">
-                      {[...Array(testimonial.rating)].map((_, j) => (
-                        <Star key={j} className="h-4 w-4 fill-amber-500 text-amber-500" />
-                      ))}
-                    </div>
-                    <CardDescription className="text-sm italic">
-                      "{testimonial.content}"
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-yellow-600 flex items-center justify-center text-white font-semibold">
-                        {testimonial.avatar}
-                      </div>
-                      <div>
-                        <p className="font-semibold">{testimonial.name}</p>
-                        <p className="text-sm text-muted-foreground">{testimonial.role}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* FAQ */}
       <section id="faq" className="py-20 px-4 sm:px-6 lg:px-8 bg-muted/30">
@@ -766,7 +684,7 @@ export function LandingPage() {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-yellow-600 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-800 to-slate-900 border border-amber-500/30 flex items-center justify-center overflow-hidden">
                   <img src="/logo-small.svg" alt="Monex" className="w-5 h-5" />
                 </div>
                 <span className="font-bold">Monex</span>
@@ -801,13 +719,8 @@ export function LandingPage() {
           </div>
           <div className="border-t pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} Monex. Todos os direitos reservados.
+              © 2024 Monex. Todos os direitos reservados.
             </p>
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <a href="#" className="hover:text-foreground">Instagram</a>
-              <a href="#" className="hover:text-foreground">Twitter</a>
-              <a href="#" className="hover:text-foreground">LinkedIn</a>
-            </div>
           </div>
         </div>
       </footer>
