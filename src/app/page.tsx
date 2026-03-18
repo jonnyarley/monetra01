@@ -87,9 +87,7 @@ export default function Home() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-yellow-600 flex items-center justify-center animate-pulse shadow-lg shadow-amber-500/20">
-            <img src="/logo-small.svg" alt="Monex" className="w-12 h-12" />
-          </div>
+          <img src="/logo-small.svg" alt="Monex" className="w-16 h-16 animate-pulse" />
           <p className="text-muted-foreground">Carregando Monex...</p>
         </div>
       </div>

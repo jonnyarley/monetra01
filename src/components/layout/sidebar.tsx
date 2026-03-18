@@ -84,9 +84,7 @@ function DesktopSidebar() {
       {/* Logo */}
       <div className="h-14 flex items-center px-3 border-b border-amber-900/20 flex-shrink-0">
         <div className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-slate-900 to-slate-800 border border-amber-500/20 flex items-center justify-center overflow-hidden">
-            <img src="/logo-small.svg" alt="Monex" className="w-7 h-7" />
-          </div>
+          <img src="/logo-small.svg" alt="Monex" className="w-9 h-9" />
           {sidebarOpen && (
             <div>
               <h1 className="text-lg font-bold bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent">Monex</h1>
@@ -230,9 +228,7 @@ function MobileSidebar() {
             {/* Logo */}
             <div className="h-14 flex items-center justify-between px-3 border-b border-amber-900/20 flex-shrink-0">
               <div className="flex items-center gap-2">
-                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-slate-900 to-slate-800 border border-amber-500/20 flex items-center justify-center overflow-hidden">
-                  <img src="/logo-small.svg" alt="Monex" className="w-7 h-7" />
-                </div>
+                <img src="/logo-small.svg" alt="Monex" className="w-9 h-9" />
                 <div>
                   <h1 className="text-lg font-bold bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent">Monex</h1>
                   <p className="text-[10px] text-amber-400/70">Gestão Financeira</p>

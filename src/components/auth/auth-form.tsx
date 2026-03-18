@@ -214,12 +214,12 @@ export function AuthForm() {
         {/* Logo */}
         <div className="relative z-10">
           <div className="flex items-center gap-3">
-            <div
+            <img
+              src="/logo-small.svg"
+              alt="Monex"
+              className="w-14 h-14 cursor-pointer"
               onClick={handleSecretAdminAccess}
-              className="w-14 h-14 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 border border-amber-500/30 backdrop-blur flex items-center justify-center overflow-hidden cursor-pointer"
-            >
-              <img src="/logo-small.svg" alt="Monex" className="w-10 h-10" />
-            </div>
+            />
             <div>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent">Monex</h1>
               <p className="text-amber-400/70 text-sm">Gestão Financeira</p>
@@ -283,12 +283,12 @@ export function AuthForm() {
         >
           {/* Mobile Logo */}
           <div className="lg:hidden flex items-center justify-center gap-3 mb-8">
-            <div
+            <img
+              src="/logo-small.svg"
+              alt="Monex"
+              className="w-12 h-12 cursor-pointer"
               onClick={handleSecretAdminAccess}
-              className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-900 to-slate-800 border border-amber-500/30 flex items-center justify-center shadow-lg overflow-hidden cursor-pointer"
-            >
-              <img src="/logo-small.svg" alt="Monex" className="w-9 h-9" />
-            </div>
+            />
             <div>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent">Monex</h1>
               <p className="text-amber-400/70 text-sm">Gestão Financeira</p>
