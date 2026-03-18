@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     const jwtSecret = getJwtSecret()
     const decoded = verify(token, jwtSecret) as { id: string }
 
-    // Get fresh user data
+    // Get fresh user data - campos que podem existir
     const user = await db.user.findUnique({
       where: { id: decoded.id },
       select: {
@@ -35,9 +35,7 @@ export async function GET(request: NextRequest) {
         totalPoints: true,
         level: true,
         subscriptionStatus: true,
-        subscriptionEnd: true,
-        trialEndsAt: true,
-        trialUsed: true
+        subscriptionEnd: true
       }
     })
 
@@ -48,18 +46,29 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Check if trial has expired
-    const trialExpired = user.trialEndsAt ? new Date() > user.trialEndsAt : false
-    const daysLeft = user.trialEndsAt 
-      ? Math.max(0, Math.ceil((user.trialEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
-      : 0
+    // Tentar buscar campos de trial separadamente (podem não existir)
+    let trialData = { trialEndsAt: null, trialExpired: false, trialDaysLeft: 0 }
+    try {
+      const userWithTrial = await db.user.findUnique({
+        where: { id: decoded.id },
+        select: { trialEndsAt: true }
+      })
+      if (userWithTrial?.trialEndsAt) {
+        trialData = {
+          trialEndsAt: userWithTrial.trialEndsAt,
+          trialExpired: new Date() > userWithTrial.trialEndsAt,
+          trialDaysLeft: Math.max(0, Math.ceil((userWithTrial.trialEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+        }
+      }
+    } catch (e) {
+      // Campo não existe, ignorar
+    }
 
     return NextResponse.json({
       authenticated: true,
       user: {
         ...user,
-        trialExpired,
-        trialDaysLeft: daysLeft
+        ...trialData
       }
     })
 

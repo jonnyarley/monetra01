@@ -17,21 +17,21 @@ const RATE_LIMIT_WINDOW = 60000 // 1 minute
 function isRateLimited(ip: string): boolean {
   const now = Date.now()
   const attempts = resetAttempts.get(ip)
-  
+
   if (!attempts) {
     resetAttempts.set(ip, { count: 1, lastAttempt: now })
     return false
   }
-  
+
   if (now - attempts.lastAttempt > RATE_LIMIT_WINDOW) {
     resetAttempts.set(ip, { count: 1, lastAttempt: now })
     return false
   }
-  
+
   if (attempts.count >= RATE_LIMIT_MAX) {
     return true
   }
-  
+
   attempts.count++
   attempts.lastAttempt = now
   return false
@@ -39,10 +39,10 @@ function isRateLimited(ip: string): boolean {
 
 export async function POST(request: NextRequest) {
   try {
-    const ip = request.headers.get("x-forwarded-for") || 
-               request.headers.get("x-real-ip") || 
+    const ip = request.headers.get("x-forwarded-for") ||
+               request.headers.get("x-real-ip") ||
                "unknown"
-    
+
     if (isRateLimited(ip)) {
       return NextResponse.json(
         { success: false, error: "Muitas tentativas. Tente novamente em 1 minuto." },
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    
+
     // Validate input
     const result = forgotPasswordSchema.safeParse(body)
     if (!result.success) {
@@ -63,9 +63,10 @@ export async function POST(request: NextRequest) {
 
     const { email } = result.data
 
-    // Find user
+    // Find user - apenas campos essenciais
     const user = await db.user.findUnique({
-      where: { email: email.toLowerCase() }
+      where: { email: email.toLowerCase() },
+      select: { id: true, email: true, name: true, password: true }
     })
 
     // Always return success to prevent email enumeration
@@ -95,11 +96,11 @@ export async function POST(request: NextRequest) {
     })
 
     // Generate reset URL
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}` 
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
       : "http://localhost:3000"
     const resetUrl = `${appUrl}/reset-password?token=${token}&email=${encodeURIComponent(email)}`
-    
+
     console.log("=".repeat(60))
     console.log("PASSWORD RESET REQUEST")
     console.log("Email:", email)
@@ -115,13 +116,12 @@ export async function POST(request: NextRequest) {
 
     if (!emailResult.success) {
       console.error("Failed to send email:", emailResult.error)
-      // Still return success to not reveal if email exists
     }
 
     return NextResponse.json({
       success: true,
       message: "Se o email existir, você receberá instruções para redefinir sua senha.",
-      // Sempre retornar o link para desenvolvimento/teste
+      // Sempre retornar o link para debug/teste
       devToken: token,
       devResetUrl: resetUrl
     })

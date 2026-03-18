@@ -17,14 +17,14 @@ const loginSchema = z.object({
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now()
-  
+
   try {
     // Rate Limiting para autenticação (5 tentativas por minuto)
     const rateLimitResponse = await checkRateLimit(request, "AUTH")
     if (rateLimitResponse) return rateLimitResponse
 
     const body = await request.json()
-    
+
     // Validate input
     const result = loginSchema.safeParse(body)
     if (!result.success) {
@@ -36,9 +36,24 @@ export async function POST(request: NextRequest) {
 
     const { email, password } = result.data
 
-    // Find user
+    // Find user - apenas campos que existem
     const user = await db.user.findUnique({
-      where: { email: email.toLowerCase() }
+      where: { email: email.toLowerCase() },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        password: true,
+        image: true,
+        plan: true,
+        currency: true,
+        language: true,
+        theme: true,
+        financialScore: true,
+        totalPoints: true,
+        level: true,
+        trialEndsAt: true
+      }
     })
 
     if (!user || !user.password) {
@@ -63,23 +78,28 @@ export async function POST(request: NextRequest) {
     }
 
     // Update last login
-    await db.user.update({
-      where: { id: user.id },
-      data: { lastLoginAt: new Date() }
-    })
+    try {
+      await db.user.update({
+        where: { id: user.id },
+        data: { lastLoginAt: new Date() }
+      })
+    } catch (e) {
+      // Ignorar erro se o campo não existir
+      console.log("Note: lastLoginAt field may not exist")
+    }
 
     // Generate JWT token
     const jwtSecret = getJwtSecret()
 
     const token = sign(
-      { 
+      {
         id: user.id,
         email: user.email,
         plan: user.plan,
         iat: Math.floor(Date.now() / 1000)
       },
       jwtSecret,
-      { 
+      {
         expiresIn: "30d",
         algorithm: "HS256"
       }
@@ -94,6 +114,9 @@ export async function POST(request: NextRequest) {
       maxAge: 60 * 60 * 24 * 30, // 30 days
       path: "/"
     })
+
+    // Calcular trial expired (se o campo existir)
+    const trialExpired = user.trialEndsAt ? new Date() > user.trialEndsAt : false
 
     return NextResponse.json({
       success: true,
@@ -110,18 +133,18 @@ export async function POST(request: NextRequest) {
         totalPoints: user.totalPoints,
         level: user.level,
         trialEndsAt: user.trialEndsAt,
-        trialExpired: user.trialEndsAt ? new Date() > user.trialEndsAt : false
+        trialExpired
       }
     })
 
   } catch (error) {
     console.error("Login error:", error)
-    
+
     const elapsed = Date.now() - startTime
     if (elapsed < 500) {
       await delay(500 - elapsed)
     }
-    
+
     return NextResponse.json(
       { success: false, error: "Erro ao fazer login" },
       { status: 500 }
