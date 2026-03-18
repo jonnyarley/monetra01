@@ -128,10 +128,10 @@ function ResetPasswordContent() {
         {/* Logo */}
         <div className="flex items-center justify-center gap-3 mb-8">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-900 to-slate-800 border border-amber-500/30 flex items-center justify-center shadow-lg overflow-hidden">
-            <img src="/logo-small.svg" alt="Monetra" className="w-9 h-9" />
+            <img src="/logo-small.svg" alt="Monex" className="w-9 h-9" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent">Monetra</h1>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent">Monex</h1>
             <p className="text-amber-400/70 text-sm">Gestão Financeira</p>
           </div>
         </div>
@@ -209,7 +209,7 @@ function ResetPasswordLoading() {
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <div className="flex flex-col items-center gap-4">
         <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-yellow-600 flex items-center justify-center animate-pulse shadow-lg shadow-amber-500/20">
-          <img src="/logo-small.svg" alt="Monetra" className="w-12 h-12" />
+          <img src="/logo-small.svg" alt="Monex" className="w-12 h-12" />
         </div>
         <p className="text-muted-foreground">Carregando...</p>
       </div>
