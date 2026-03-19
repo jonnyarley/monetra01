@@ -136,6 +136,11 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// DELETE para limpar dados (alternativo)
+export async function DELETE(request: NextRequest) {
+  return POST(request)
+}
+
 // GET para ver quantidade de dados
 export async function GET(request: NextRequest) {
   try {
