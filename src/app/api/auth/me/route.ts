@@ -64,10 +64,39 @@ export async function GET(request: NextRequest) {
       // Campo não existe, ignorar
     }
 
+    // Verificar se a assinatura expirou e atualizar plano se necessário
+    let updatedUser = user
+    if (user.subscriptionEnd && new Date() > user.subscriptionEnd && user.plan !== "FREE") {
+      // Assinatura expirada - rebaixar para FREE
+      updatedUser = await db.user.update({
+        where: { id: decoded.id },
+        data: {
+          plan: "FREE",
+          subscriptionStatus: "EXPIRED"
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+          plan: true,
+          currency: true,
+          language: true,
+          theme: true,
+          financialScore: true,
+          totalPoints: true,
+          level: true,
+          subscriptionStatus: true,
+          subscriptionEnd: true
+        }
+      })
+      console.log(`[AUTH] Assinatura expirada para usuário ${decoded.id}, plano rebaixado para FREE`)
+    }
+
     return NextResponse.json({
       authenticated: true,
       user: {
-        ...user,
+        ...updatedUser,
         ...trialData
       }
     })

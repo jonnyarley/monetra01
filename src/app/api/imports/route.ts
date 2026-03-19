@@ -5,6 +5,7 @@ import * as XLSX from "xlsx"
 import { db } from "@/lib/db"
 import { getJwtSecret } from "@/lib/jwt-secret"
 import { RecurringFrequency, Prisma } from "@prisma/client"
+import { invalidateUserCache, invalidateTransactionCache } from "@/lib/cache"
 
 // Helper para converter valor brasileiro para número
 function toNumber(val: any): number | null {
@@ -574,6 +575,10 @@ export async function POST(request: NextRequest) {
 
     const totalIncome = imported.filter(t => t.type === "INCOME").reduce((sum, t) => sum + Number(t.amount), 0)
     const totalExpense = imported.filter(t => t.type === "EXPENSE").reduce((sum, t) => sum + Number(t.amount), 0)
+
+    // Invalidar cache do dashboard e transações
+    await invalidateUserCache(decoded.id)
+    console.log("[IMPORT] Cache invalidado")
 
     console.log(`[IMPORT] ========== FINALIZADO ==========`)
     console.log(`[IMPORT] ${imported.length} importadas, ${duplicates.length} duplicadas`)

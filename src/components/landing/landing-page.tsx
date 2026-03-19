@@ -117,7 +117,7 @@ const plans = [
     features: [
       "Tudo do Teste Grátis +",
       "Relatórios IA ilimitados",
-      "Integração bancária*",
+      "Integração bancária (em breve)",
       "Suporte VIP prioritário",
       "Sem anúncios",
       "Exportação avançada"
@@ -137,7 +137,7 @@ const plans = [
       "Até 5 membros",
       "Metas em conjunto",
       "Suporte dedicado 24/7",
-      "API de integração*"
+      "API de integração (em breve)"
     ],
     cta: "Assinar Business",
     popular: false
