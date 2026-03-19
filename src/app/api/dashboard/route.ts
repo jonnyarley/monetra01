@@ -5,6 +5,7 @@ import { db } from "@/lib/db"
 import { getJwtSecret } from "@/lib/jwt-secret"
 import { cacheOrFetch, CACHE_TTL, invalidateUserCache } from "@/lib/cache"
 import { checkRateLimit } from "@/lib/rate-limit"
+import { checkAndAwardBadges, LEVELS } from "@/app/api/monscore/route"
 
 // Helper function to ensure valid numbers
 const safeNumber = (value: any, defaultValue = 0): number => {
@@ -286,35 +287,48 @@ async function fetchDashboardData(userId: string) {
     targetDate: g.targetDate
   }))
 
-  // ===== MONE SCORE =====
-  const userData = await db.user.findUnique({
-    where: { id: userId },
-    select: {
-      financialScore: true,
-      totalPoints: true,
-      level: true
-    }
-  })
-
-  // Contar conquistas do usuário
+  // ===== MONE SCORE - Calcular dinamicamente =====
+  // Recalcular score para garantir que está atualizado
+  let totalPoints = 0
   let earnedBadgesCount = 0
+  let currentLevel = LEVELS[0]
+
   try {
+    // Verificar e atribuir novas conquistas (igual à página do MonetScore)
+    const scoreResult = await checkAndAwardBadges(userId)
+    totalPoints = scoreResult.totalPoints
+
+    // Determinar nível baseado nos pontos
+    currentLevel = LEVELS.find(l => totalPoints >= l.minScore && totalPoints <= l.maxScore) || LEVELS[0]
+
+    // Contar conquistas do usuário
     earnedBadgesCount = await db.userAchievement.count({
       where: { userId }
     })
+
+    // Score máximo é 1000
+    const score = Math.min(totalPoints, 1000)
+
+    // Atualizar usuário com os valores corretos
+    await db.user.update({
+      where: { id: userId },
+      data: {
+        financialScore: score,
+        totalPoints: totalPoints,
+        level: currentLevel.level
+      }
+    })
+
+    console.log(`[DASHBOARD] Mone Score recalculado: ${score} pts, Nível ${currentLevel.level} (${currentLevel.name})`)
   } catch (e) {
-    console.log("[DASHBOARD] Erro ao contar conquistas:", e)
+    console.log("[DASHBOARD] Erro ao calcular Mone Score:", e)
   }
 
-  // Níveis do Mone Score
-  const levelNames = ["Iniciante", "Aprendiz", "Intermediário", "Avançado", "Expert", "Mestre"]
-  const userLevel = userData?.level || 1
-
   const monScore = {
-    score: userData?.financialScore || 0,
-    totalPoints: userData?.totalPoints || 0,
-    level: userLevel,
-    levelName: levelNames[userLevel - 1] || "Iniciante",
+    score: Math.min(totalPoints, 1000),
+    totalPoints,
+    level: currentLevel.level,
+    levelName: currentLevel.name,
     earnedBadgesCount
   }
 

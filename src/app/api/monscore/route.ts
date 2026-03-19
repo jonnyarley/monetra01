@@ -98,7 +98,7 @@ const BADGES_DEFINITION = [
 ]
 
 // Níveis disponíveis
-const LEVELS = [
+export const LEVELS = [
   { name: "Iniciante", minScore: 0, maxScore: 100, level: 1 },
   { name: "Aprendiz", minScore: 101, maxScore: 250, level: 2 },
   { name: "Intermediário", minScore: 251, maxScore: 500, level: 3 },
