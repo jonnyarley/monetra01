@@ -176,6 +176,41 @@ async function fetchDashboardData(userId: string) {
   console.log(`[DASHBOARD] Saldo inicial contas: R$ ${initialBalance.toFixed(2)}`)
   console.log(`[DASHBOARD] Saldo total: R$ ${totalBalance.toFixed(2)}`)
 
+  // ===== GASTOS RECORRENTES =====
+  const recurringTransactions = await db.recurringTransaction.findMany({
+    where: { 
+      userId,
+      isActive: true 
+    },
+    select: {
+      id: true,
+      type: true,
+      amount: true,
+      description: true,
+      frequency: true,
+      nextDueDate: true,
+      category: {
+        select: { id: true, name: true, icon: true, color: true }
+      }
+    }
+  })
+
+  const monthlyRecurringExpenses = recurringTransactions
+    .filter(r => r.type === "EXPENSE" && r.frequency === "MONTHLY")
+    .reduce((sum, r) => sum + safeNumber(r.amount), 0)
+
+  const yearlyRecurringExpenses = recurringTransactions
+    .filter(r => r.type === "EXPENSE" && r.frequency === "YEARLY")
+    .reduce((sum, r) => sum + safeNumber(r.amount) / 12, 0)
+
+  const weeklyRecurringExpenses = recurringTransactions
+    .filter(r => r.type === "EXPENSE" && r.frequency === "WEEKLY")
+    .reduce((sum, r) => sum + safeNumber(r.amount) * 4.33, 0)
+
+  const totalRecurringMonthly = monthlyRecurringExpenses + yearlyRecurringExpenses + weeklyRecurringExpenses
+
+  console.log(`[DASHBOARD] Gastos recorrentes mensais: R$ ${totalRecurringMonthly.toFixed(2)}`)
+
   // ===== DESPESAS POR CATEGORIA (MÊS ATUAL) =====
   const categoryMap = new Map<string, {
     categoryId: string
@@ -326,6 +361,20 @@ async function fetchDashboardData(userId: string) {
     monthlyData,
     goals: formattedGoals,
     budgets: [],
-    monScore
+    monScore,
+    recurringExpenses: {
+      total: safeNumber(totalRecurringMonthly),
+      monthly: safeNumber(monthlyRecurringExpenses),
+      yearly: safeNumber(yearlyRecurringExpenses),
+      weekly: safeNumber(weeklyRecurringExpenses),
+      items: recurringTransactions.filter(r => r.type === "EXPENSE").map(r => ({
+        id: r.id,
+        description: r.description,
+        amount: safeNumber(r.amount),
+        frequency: r.frequency,
+        nextDueDate: r.nextDueDate,
+        category: r.category
+      }))
+    }
   }
 }

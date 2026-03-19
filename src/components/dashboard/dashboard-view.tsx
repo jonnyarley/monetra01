@@ -49,6 +49,7 @@ import {
   PieChart,
   Pie,
   Cell,
+  Legend,
 } from "recharts"
 
 const COLORS = ["#f59e0b", "#d97706", "#b45309", "#92400e", "#78350f", "#fbbf24"]
@@ -107,6 +108,20 @@ interface DashboardData {
     level: number
     levelName: string
     earnedBadgesCount: number
+  }
+  recurringExpenses?: {
+    total: number
+    monthly: number
+    yearly: number
+    weekly: number
+    items: Array<{
+      id: string
+      description: string
+      amount: number
+      frequency: string
+      nextDueDate: Date
+      category: { id: string; name: string; icon: string | null; color: string | null } | null
+    }>
   }
 }
 
@@ -444,48 +459,62 @@ export function DashboardView() {
                 </div>
               ) : (
                 <div className="h-[200px] md:h-[300px]">
+                  {/* Gráfico de Pizza - Fluxo Financeiro */}
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={monthlyData}>
-                      <defs>
-                        <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
-                          <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
-                        </linearGradient>
-                        <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.3} />
-                          <stop offset="95%" stopColor="#f43f5e" stopOpacity={0} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                      <XAxis dataKey="month" className="text-[10px] md:text-xs" />
-                      <YAxis className="text-[10px] md:text-xs" tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`} width={35} />
-                      <Tooltip
+                    <PieChart>
+                      <Pie
+                        data={[
+                          { name: "Receitas", value: overview.monthlyIncome, color: "#22c55e" },
+                          { name: "Despesas", value: overview.monthlyExpense, color: "#f43f5e" },
+                        ].filter(d => d.value > 0)}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={50}
+                        outerRadius={80}
+                        paddingAngle={3}
+                        dataKey="value"
+                      >
+                        <Cell fill="#22c55e" />
+                        <Cell fill="#f43f5e" />
+                      </Pie>
+                      <Tooltip 
+                        formatter={(value: number) => formatCurrency(value)}
                         contentStyle={{
                           backgroundColor: "hsl(var(--card))",
                           border: "1px solid hsl(var(--border))",
                           borderRadius: "8px",
                           fontSize: "12px",
                         }}
-                        formatter={(value: number) => formatCurrency(value)}
                       />
-                      <Area
-                        type="monotone"
-                        dataKey="income"
-                        name="Receitas"
-                        stroke="#f59e0b"
-                        fill="url(#incomeGradient)"
-                        strokeWidth={2}
-                      />
-                      <Area
-                        type="monotone"
-                        dataKey="expense"
-                        name="Despesas"
-                        stroke="#f43f5e"
-                        fill="url(#expenseGradient)"
-                        strokeWidth={2}
-                      />
-                    </AreaChart>
+                      <Legend />
+                    </PieChart>
                   </ResponsiveContainer>
+                  
+                  {/* Resumo abaixo do gráfico */}
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+                      <div className="flex items-center gap-2">
+                        <ArrowUpRight className="h-4 w-4 text-green-500" />
+                        <span className="text-sm text-green-600">Receitas</span>
+                      </div>
+                      <span className="font-bold text-green-600">{formatCurrency(overview.monthlyIncome)}</span>
+                    </div>
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-rose-500/10 border border-rose-500/20">
+                      <div className="flex items-center gap-2">
+                        <ArrowDownRight className="h-4 w-4 text-rose-500" />
+                        <span className="text-sm text-rose-600">Despesas</span>
+                      </div>
+                      <span className="font-bold text-rose-600">{formatCurrency(overview.monthlyExpense)}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Saldo do mês */}
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50 mt-2">
+                    <span className="text-sm text-muted-foreground">Saldo do Mês</span>
+                    <span className={`font-bold ${overview.monthlyBalance >= 0 ? 'text-green-500' : 'text-rose-500'}`}>
+                      {overview.monthlyBalance >= 0 ? '+' : ''}{formatCurrency(overview.monthlyBalance)}
+                    </span>
+                  </div>
                 </div>
               )}
             </CardContent>
